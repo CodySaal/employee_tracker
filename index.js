@@ -1,3 +1,5 @@
+import * as dotenv from "dotenv";
+dotenv.config();
 import mysql from "mysql2";
 import inquirer from "inquirer";
 
@@ -9,7 +11,17 @@ const connection = mysql.createConnection({
 
 // WHEN I choose to view all departments
 // THEN I am presented with a formatted table showing department names and department ids
-
+const viewDepartments = async () => {
+    try {
+        const [departments] = await connection.promise().query(
+            "SELECT * FROM department"
+        )
+        console.table(departments)
+        menuPrompt();
+    } catch(err) {
+        throw new Error(err)
+    }
+}
 // WHEN I choose to view all roles
 // THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
 
@@ -42,7 +54,7 @@ const menuPrompt = async () => {
     ])
 
     if (answers.action === "View All Departments"){
-        console.log("viewDepartments")
+        viewDepartments();
     } else if (answers.action === "View All Roles") {
         console.log("viewRoles")
     } else if (answers.action === "View All Employees") {
@@ -59,3 +71,5 @@ const menuPrompt = async () => {
         process.exit(0)
     }
 }
+
+menuPrompt();
