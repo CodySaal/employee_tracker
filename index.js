@@ -56,7 +56,26 @@ const viewEmployees = async () => {
 };
 // WHEN I choose to add a department
 // THEN I am prompted to enter the name of the department and that department is added to the database
+const addDepartment = async () => {
+    const answer = await inquirer.prompt([
+        {
+            type: "input",
+            name: "department",
+            message: "What is the name of the department?"
+        }
+    ])
+    try {
+        const [results] = await connection.promise().query(`
+        INSERT INTO department (name)
+        VALUES (?)
+        `, [answer.department])
 
+        console.log("Department added!")
+        menuPrompt()
+    } catch(err) {
+        throw new Error(err)
+    }
+};
 // WHEN I choose to add a role
 // THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
 
@@ -86,7 +105,7 @@ const menuPrompt = async () => {
     } else if (answers.action === "View All Employees") {
         viewEmployees();
     } else if (answers.action === "Add a Department") {
-        console.log("addDepartment")
+        addDepartment();
     } else if (answers.action === "Add a Role") {
         console.log("addRole")
     } else if (answers.action === "Add an Employee") {
