@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
     host: "localhost",
     user: process.env.DB_USER,
     database: process.env.DB_NAME
-})
+});
 
 // WHEN I choose to view all departments
 // THEN I am presented with a formatted table showing department names and department ids
@@ -15,16 +15,26 @@ const viewDepartments = async () => {
     try {
         const [departments] = await connection.promise().query(
             "SELECT * FROM department"
-        )
-        console.table(departments)
+        );
+        console.table(departments);
+        menuPrompt();
+    } catch(err) {
+        throw new Error(err);
+    };
+};
+// WHEN I choose to view all roles
+// THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
+const viewRoles = async () => {
+    try {
+        const [roles] = await connection.promise().query(
+            "SELECT role.id, role.title, department.name AS department, role.salary FROM role INNER JOIN department ON role.department_id=department.id"
+        );
+        console.table(roles);
         menuPrompt();
     } catch(err) {
         throw new Error(err)
-    }
-}
-// WHEN I choose to view all roles
-// THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
-
+    };
+};
 // WHEN I choose to view all employees
 // THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
 
@@ -51,12 +61,12 @@ const menuPrompt = async () => {
             message: "What would you like to do?",
             choices: ["View All Departments", "View All Roles", "View All Employees", "Add a Department", "Add a Role", "Add an Employee", "Update an Employee Role", "Quit"]
         }
-    ])
+    ]);
 
     if (answers.action === "View All Departments"){
         viewDepartments();
     } else if (answers.action === "View All Roles") {
-        console.log("viewRoles")
+        viewRoles();
     } else if (answers.action === "View All Employees") {
         console.log("viewEmployees")
     } else if (answers.action === "Add a Department") {
@@ -69,7 +79,7 @@ const menuPrompt = async () => {
         console.log("updateEmployeeRole")
     } else {
         process.exit(0)
-    }
-}
+    };
+};
 
 menuPrompt();
