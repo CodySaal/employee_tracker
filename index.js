@@ -3,6 +3,7 @@ dotenv.config();
 import mysql from "mysql2";
 import inquirer from "inquirer";
 
+
 const connection = mysql.createConnection({
     host: "localhost",
     user: process.env.DB_USER,
@@ -37,7 +38,22 @@ const viewRoles = async () => {
 };
 // WHEN I choose to view all employees
 // THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
-
+const viewEmployees = async () => {
+    try {
+        const [employees] = await connection.promise().query(`
+            SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager 
+            FROM employee employee 
+            INNER JOIN role ON employee.role_id=role.id
+            INNER JOIN department ON role.department_id=department.id 
+            LEFT JOIN employee manager ON employee.manager_id=manager.id
+        `
+        );
+        console.table(employees);
+        menuPrompt();
+    } catch(err) {
+        throw new Error(err)
+    };
+};
 // WHEN I choose to add a department
 // THEN I am prompted to enter the name of the department and that department is added to the database
 
@@ -68,7 +84,7 @@ const menuPrompt = async () => {
     } else if (answers.action === "View All Roles") {
         viewRoles();
     } else if (answers.action === "View All Employees") {
-        console.log("viewEmployees")
+        viewEmployees();
     } else if (answers.action === "Add a Department") {
         console.log("addDepartment")
     } else if (answers.action === "Add a Role") {
