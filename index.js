@@ -106,7 +106,7 @@ const addRole = async () => {
         INSERT INTO role (title, salary, department_id)
         VALUES (?, ?, ?)
         `, [answers.name, answers.salary, result[0].id])
-        
+
         console.log(`${answers.name} was added!`)
         menuPrompt();
     } catch(err) {
@@ -115,7 +115,71 @@ const addRole = async () => {
 };
 // WHEN I choose to add an employee
 // THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
-
+const addEmployee = async () => {
+    connection.query("SELECT role.title, employee.first_name, employee.last_name FROM role LEFT JOIN employee ON role.id = employee.role_id", async (err, res) => {
+        console.log(res)
+        const answers = await inquirer.prompt([
+            {
+                type: "input",
+                name: "first_name",
+                message: "What is the first name of the employee?"
+            },
+            {
+                type: "input",
+                name: "last_name",
+                message: "What is the last name of the employee?"
+            },
+            {
+                type: "list",
+                name: "role",
+                message: "What is the employee's role?",
+                choices: res.map(role => role.title) // Getting duplicate roles
+            },
+            {
+                type: "list",
+                name: "manager",
+                message: "Who is the employee's manager?",
+                choices: () => {
+                    let managers = ["None"]
+    
+                    for (let i = 0; i < res.length; i++) {
+                        if (res[i].first_name != null || res[i].last_name != null) {
+                            let managerName = `${res[i].first_name} ${res[i].last_name}`
+    
+                            managers.push(managerName)
+                        }
+                    }
+                    return managers
+                }
+            },
+        ]);
+        try {
+            const [role] = await connection.promise().query("SELECT id FROM role WHERE title = ?", [answers.role])
+    
+            const managersArray = answers.manager.split(" ")
+    
+            if (managersArray[0] != "None") {
+                const [manager] = await connection.promise().query("SELECT id FROM employee WHERE first_name = ? and last_name = ?", [managersArray[0], managersArray[1]])
+                await connection.promise().query(`
+                INSERT INTO employee (first_name, last_name, role_id, manager_id) 
+                VALUES (?, ?, ?, ?)
+                `, [answers.first_name, answers.last_name, role[0].id, manager[0].id])
+            } else {
+                await connection.promise().query(`
+                INSERT INTO employee (first_name, last_name, role_id) 
+                VALUES (?, ?, ?)
+                `, [answers.first_name, answers.last_name, role[0].id])
+            }
+    
+            console.log(`Added ${answers.first_name} ${answers.last_name} to the database.`)
+    
+            menuPrompt();
+        } catch(err) {
+            throw new Error(err)
+        }
+    })
+    
+};
 // WHEN I choose to update an employee role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
 
@@ -143,7 +207,7 @@ const menuPrompt = async () => {
     } else if (answers.action === "Add a Role") {
         addRole();
     } else if (answers.action === "Add an Employee") {
-        console.log("addEmployee")
+        addEmployee();
     } else if (answers.action === "Update an Employee Role") {
         console.log("updateEmployeeRole")
     } else {
