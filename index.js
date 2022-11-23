@@ -96,6 +96,7 @@ const addRole = async () => {
             message: "Which department does the role belong to?",
             choices: async () => {
                 const [result] = await connection.promise().query("SELECT * FROM department")
+                console.log(result)
                 return result
             }
         },
@@ -115,9 +116,12 @@ const addRole = async () => {
 };
 // WHEN I choose to add an employee
 // THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
+// Idea 2 addEmployee
 const addEmployee = async () => {
     connection.query("SELECT role.title, employee.first_name, employee.last_name FROM role LEFT JOIN employee ON role.id = employee.role_id", async (err, res) => {
         console.log(res)
+        const roles = res.map(role => role.title)
+        console.log(roles)
         const answers = await inquirer.prompt([
             {
                 type: "input",
@@ -133,7 +137,11 @@ const addEmployee = async () => {
                 type: "list",
                 name: "role",
                 message: "What is the employee's role?",
-                choices: res.map(role => role.title) // Getting duplicate roles
+                choices: () => {
+                    let roles = res.map(role => role.title)
+                    let rolesChoices = [...new Set(roles)]
+                    return rolesChoices
+                }
             },
             {
                 type: "list",
@@ -178,11 +186,13 @@ const addEmployee = async () => {
             throw new Error(err)
         }
     })
-    
 };
+
 // WHEN I choose to update an employee role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
+const updateEmployeeRole = async () => {
 
+}
 // WHEN I start the application
 // THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
 
