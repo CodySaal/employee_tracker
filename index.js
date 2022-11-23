@@ -78,7 +78,41 @@ const addDepartment = async () => {
 };
 // WHEN I choose to add a role
 // THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
-
+const addRole = async () => {
+    const answers = await inquirer.prompt([
+        {
+            type: "input",
+            name: "name",
+            message: "What is the name of the role?"
+        },
+        {
+            type: "number",
+            name: "salary",
+            message: "What is the salary of the role?"
+        },
+        {
+            type: "list",
+            name: "department",
+            message: "Which department does the role belong to?",
+            choices: async () => {
+                const [result] = await connection.promise().query("SELECT * FROM department")
+                return result
+            }
+        },
+    ]);
+    try {
+        const [result] = await connection.promise().query("SELECT id FROM department WHERE name = ?", [answers.department])
+        await connection.promise().query(`
+        INSERT INTO role (title, salary, department_id)
+        VALUES (?, ?, ?)
+        `, [answers.name, answers.salary, result[0].id])
+        
+        console.log(`${answers.name} was added!`)
+        menuPrompt();
+    } catch(err) {
+        throw new Error(err)
+    }
+};
 // WHEN I choose to add an employee
 // THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
 
@@ -107,7 +141,7 @@ const menuPrompt = async () => {
     } else if (answers.action === "Add a Department") {
         addDepartment();
     } else if (answers.action === "Add a Role") {
-        console.log("addRole")
+        addRole();
     } else if (answers.action === "Add an Employee") {
         console.log("addEmployee")
     } else if (answers.action === "Update an Employee Role") {
