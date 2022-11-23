@@ -191,8 +191,51 @@ const addEmployee = async () => {
 // WHEN I choose to update an employee role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
 const updateEmployeeRole = async () => {
+    connection.query("SELECT role.title, employee.first_name, employee.last_name FROM role LEFT JOIN employee ON role.id = employee.role_id", async (err, res) => {
+        const answers = await inquirer.prompt([
+            {
+                type: "list",
+                name: "employee",
+                message: "Which employee's role do you want to update?",
+                choices: () => {
+                    let employees = []
+    
+                    for (let i = 0; i < res.length; i++) {
+                        if (res[i].first_name != null || res[i].last_name != null) {
+                            let employeeName = `${res[i].first_name} ${res[i].last_name}`
+    
+                            employees.push(employeeName)
+                        }
+                    }
+                    return employees
+                }
+            },
+            {
+                type: "list",
+                name: "role",
+                message: "Which role do you want to assign the selected employee?",
+                choices: () => {
+                    let roles = res.map(role => role.title)
+                    let rolesChoices = [...new Set(roles)]
+                    return rolesChoices
+                }
+            }
+        ]);
+        try {
+            const employeeNameSplit = answers.employee.split(" ")
+            const [employeeId] = await connection.promise().query("SELECT id FROM employee WHERE first_name = ? AND last_name = ?", [employeeNameSplit[0], employeeNameSplit[1]])
 
-}
+            const [role] = await connection.promise().query("SELECT id FROM role WHERE title = ?", [answers.role])
+
+            await connection.promise().query("UPDATE employee SET role_id = ? WHERE id = ?", [role[0].id, employeeId[0].id])
+
+            console.log("Updated employee's role")
+            menuPrompt();
+        } catch(err) {
+            throw new Error(err)
+        }
+    });
+};
 // WHEN I start the application
 // THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
 
@@ -219,7 +262,7 @@ const menuPrompt = async () => {
     } else if (answers.action === "Add an Employee") {
         addEmployee();
     } else if (answers.action === "Update an Employee Role") {
-        console.log("updateEmployeeRole")
+        updateEmployeeRole();
     } else {
         process.exit(0)
     };
