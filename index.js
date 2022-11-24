@@ -2,6 +2,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 import mysql from "mysql2";
 import inquirer from "inquirer";
+import cTable from "console.table"
 
 
 const connection = mysql.createConnection({
