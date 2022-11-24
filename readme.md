@@ -19,6 +19,7 @@ The user can clone the code from the GitHub repo. Once the code is cloned and op
 
 To use this project, after installation, the user can run `npm start` and they will be prompted with the menu. From here the user can choose what they would like to do. Once a choice is made the user will either be prompted to answer a few questions or a table will be shown with the data the user asked for.
 
+[Walkthrough Video](https://drive.google.com/file/d/18truV74izLLe64WVNd49XaVtKJ-BF3-n/view?usp=sharing 'Employee Tracker Walkthrough Video')
 
 
 ## Credits
