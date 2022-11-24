@@ -100,7 +100,6 @@ const addRole = async () => {
             message: "Which department does the role belong to?",
             choices: async () => {
                 const [result] = await connection.promise().query("SELECT * FROM department")
-                console.log(result)
                 return result
             }
         },

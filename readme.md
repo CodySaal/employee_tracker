@@ -2,16 +2,9 @@
 
 ## Description
 
-Provide a short description explaining the what, why, and how of your project. Use the following questions as a guide:
+The motivation behind this project was to create something that used SQL. This project allowed me to practice handling promises and using the CRUD methods. The project solves a business owners concern of not having organized business plans. With this project an owner can quickly pull up the data necessary on each employee as well as add new roles and departments. While completing this project I learn a lot about joining tables of data together. I also learned how to use Set objects.
 
-- What was your motivation?
-- Why did you build this project? (Note: the answer is not "Because it was a homework assignment.")
-- What problem does it solve?
-- What did you learn?
-
-## Table of Contents (Optional)
-
-If your README is long, add a table of contents to make it easy for users to find what they need.
+## Table of Contents
 
 - [Installation](#installation)
 - [Usage](#usage)
@@ -20,17 +13,13 @@ If your README is long, add a table of contents to make it easy for users to fin
 
 ## Installation
 
-The user can clone the code from the GitHub repo. Once the code is cloned and opened in a code editor the user should install all npm packages by running `npm i`. The user will also have to create a .env file in order to store their credentials for the connection. The user needs a DB_USER and DB_NAME within the .env. If the user has a password on their mysql they will also need a DB_PASSWORD which will also need to be put within the connection variable.
+The user can clone the code from the GitHub repo. Once the code is cloned and opened in a code editor the user should install all npm packages by running `npm i`. The user will also have to create a .env file in order to store their credentials for the connection. The user needs a DB_USER and DB_NAME within the .env. If the user has a password on their mysql they will also need a DB_PASSWORD which will also need to be put within the connection variable. The last step is to run the schema file with mysql. The user will enter their mysql shell and run `SOURCE db/shema.sql` from the root of the project. The project is now ready to be used.
 
 ## Usage
 
-Provide instructions and examples for use. Include screenshots as needed.
+To use this project, after installation, the user can run `npm start` and they will be prompted with the menu. From here the user can choose what they would like to do. Once a choice is made the user will either be prompted to answer a few questions or a table will be shown with the data the user asked for.
 
-To add a screenshot, create an `assets/images` folder in your repository and upload your screenshot to it. Then, using the relative filepath, add it to your README using the following syntax:
 
-    ```md
-    ![alt text](assets/images/screenshot.png)
-    ```
 
 ## Credits
 
